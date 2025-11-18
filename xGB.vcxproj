@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{23df64fd-62aa-417d-beb9-21e77b9514c9}</ProjectGuid>
-    <RootNamespace>GBEmu</RootNamespace>
+    <ProjectGuid>{0fda0d3c-f8ab-4a57-8863-207d68c80a0f}</ProjectGuid>
+    <RootNamespace>xGB</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -123,14 +123,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="cpu.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="memory.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="cpu.h" />
-    <ClInclude Include="memory.h" />
-    <ClInclude Include="sysInfo.h" />
+    <ClCompile Include="xGB.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
