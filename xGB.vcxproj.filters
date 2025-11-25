@@ -18,8 +18,19 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cpu.cpp">
+    <ClCompile Include="central.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="pixel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="central.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pixel.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
