@@ -1,9 +1,6 @@
 #pragma once
 #include "memory.h"
 
-class cpu;
-class memory;
-
 class cpu
 {
 	public:
@@ -76,4 +73,5 @@ class cpu
 	void dec8(uint8_t* reg);
 };
 
-void init();
+void init(class memory* mem);
+void run();

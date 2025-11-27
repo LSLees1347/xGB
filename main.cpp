@@ -1,11 +1,14 @@
 #include <iostream>
 #include "central.h"
 
+class memory mem;
+
 int main()
 {
-    std::cout << "run...\n";
+    std::cout << "running...\n";
 
-    init();
+    init(&mem);
+    run();
 
     return 0;
 }
