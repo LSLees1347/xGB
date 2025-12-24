@@ -1,11 +1,22 @@
 #pragma once
-#include "memory.h"
+//#include <cstdint>
+
+class xgb;
 
 class cpu
 {
-	public:
+public:
 
-	memory* mem;
+	void attachSys(xgb*);
+	uint8_t tick();
+	void setFlag(uint8_t flag, bool set);
+	void inc8(uint8_t* reg);
+	void dec8(uint8_t* reg);
+
+private:
+
+	xgb* sys = 0;
+	bool ime = false;
 
 	uint8_t regA = 0;
 	uint8_t regF = 0;
@@ -66,12 +77,4 @@ class cpu
 		regH = hl >> 8;
 		regL = hl & 0xff;
 	}
-
-	uint8_t tick();
-	void setFlag(uint8_t flag, bool set);
-	void inc8(uint8_t* reg);
-	void dec8(uint8_t* reg);
 };
-
-void init(class memory* mem);
-void run();

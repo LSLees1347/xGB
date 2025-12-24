@@ -18,6 +18,18 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\xCentral.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\xPixel.cpp" />
+    <ClCompile Include="src\xSystem.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\xCentral.h" />
+    <ClInclude Include="src\xMem.h" />
+    <ClInclude Include="src\xPixel.h" />
+    <ClInclude Include="src\xSystem.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -122,16 +134,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="central.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="pixel.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="central.h" />
-    <ClInclude Include="memory.h" />
-    <ClInclude Include="pixel.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

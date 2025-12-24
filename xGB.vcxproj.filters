@@ -15,25 +15,31 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="src\xCentral.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="central.cpp">
+    <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="pixel.cpp">
+    <ClCompile Include="src\xPixel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\xSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="central.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="src\xMem.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="pixel.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="src\xPixel.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="memory.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="src\xCentral.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\xSystem.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

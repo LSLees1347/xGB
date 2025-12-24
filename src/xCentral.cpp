@@ -1,19 +1,11 @@
 #include <iostream>
-#include "central.h"
+#include "xCentral.h"
+#include "xSystem.h"
 
-class cpu cpu;
 
-void init(class memory* mem)
+void cpu::attachSys(xgb* s)
 {
-	cpu.mem = mem;
-	cpu.regPC = 0;
-}
-
-void run()
-{
-	while (0 != cpu.tick())
-	{
-	}
+	this->sys = s;
 }
 
 void cpu::setFlag(uint8_t flag, bool set)
@@ -28,7 +20,6 @@ void cpu::inc8(uint8_t* reg)
 	setFlag(flagZ, *reg == 0);
 	setFlag(flagN, false);
 	setFlag(flagH, (*reg & 0x0f) == 0);
-
 }
 
 void cpu::dec8(uint8_t* reg)
@@ -41,7 +32,7 @@ void cpu::dec8(uint8_t* reg)
 
 uint8_t cpu::tick()
 {
-	uint8_t opcode = this->mem->read(regPC++);
+	uint8_t opcode = this->sys->read(regPC++, true);
 
 	switch (opcode)
 	{
@@ -52,8 +43,8 @@ uint8_t cpu::tick()
 
 		case 0x01: // LD BC, u16
 		{
-			uint8_t lo = this->mem->read(regPC++);
-			uint8_t hi = this->mem->read(regPC++);
+			uint8_t lo = this->sys->read(regPC++, true);
+			uint8_t hi = this->sys->read(regPC++, true);
 
 			this->setBC((hi << 8) | lo);
 			return 12;
@@ -61,8 +52,8 @@ uint8_t cpu::tick()
 		
 		case 0x11: // LD DE, u16
 		{
-			uint8_t lo = this->mem->read(regPC++);
-			uint8_t hi = this->mem->read(regPC++);
+			uint8_t lo = this->sys->read(regPC++, true);
+			uint8_t hi = this->sys->read(regPC++, true);
 
 			this->setDE((hi << 8) | lo);
 			return 12;
@@ -70,8 +61,8 @@ uint8_t cpu::tick()
 
 		case 0x21: // LD HL, u16
 		{
-			uint8_t lo = this->mem->read(regPC++);
-			uint8_t hi = this->mem->read(regPC++);
+			uint8_t lo = this->sys->read(regPC++, true);
+			uint8_t hi = this->sys->read(regPC++, true);
 
 			this->setHL((hi << 8) | lo);
 			return 12;
@@ -79,8 +70,8 @@ uint8_t cpu::tick()
 
 		case 0x31: // LD SP, u16
 		{
-			uint8_t lo = this->mem->read(regPC++);
-			uint8_t hi = this->mem->read(regPC++);
+			uint8_t lo = this->sys->read(regPC++, true);
+			uint8_t hi = this->sys->read(regPC++, true);
 
 			this->regSP = ((hi << 8) | lo);
 			return 12;
@@ -197,20 +188,20 @@ uint8_t cpu::tick()
 		case 0x34: // INC (HL)
 		{
 			uint16_t addr = getHL();
-			uint8_t val = this->mem->read(addr);
+			uint8_t val = this->sys->read(addr, true);
 
 			inc8(&val);
-			this->mem->write(addr, val);
+			this->sys->write(addr, val);
 			return 12;
 		}
 
 		case 0x35: // DEC (HL)
 		{
 			uint16_t addr = getHL();
-			uint8_t val = this->mem->read(addr);
+			uint8_t val = this->sys->read(addr, true);
 
 			dec8(&val);
-			this->mem->write(addr, val);
+			this->sys->write(addr, val);
 			return 12;
 		}
 
@@ -510,197 +501,209 @@ uint8_t cpu::tick()
 
 		case 0x70: // LD (HL), B
 		{
-			this->mem->write(this->getHL(), this->regB);
+			this->sys->write(this->getHL(), this->regB);
 			return 8;
 		}
 
 		case 0x71: // LD (HL), C
 		{
-			this->mem->write(this->getHL(), this->regC);
+			this->sys->write(this->getHL(), this->regC);
 			return 8;
 		}
 
 		case 0x72: // LD (HL), D
 		{
-			this->mem->write(this->getHL(), this->regD);
+			this->sys->write(this->getHL(), this->regD);
 			return 8;
 		}
 
 		case 0x73: // LD (HL), E
 		{
-			this->mem->write(this->getHL(), this->regE);
+			this->sys->write(this->getHL(), this->regE);
 			return 8;
 		}
 
 		case 0x74: // LD (HL), H
 		{
-			this->mem->write(this->getHL(), this->regH);
+			this->sys->write(this->getHL(), this->regH);
 			return 8;
 		}
 
 		case 0x75: // LD (HL), L
 		{
-			this->mem->write(this->getHL(), this->regL);
+			this->sys->write(this->getHL(), this->regL);
 			return 8;
 		}
 
 		case 0x77: // LD (HL), A
 		{
-			this->mem->write(this->getHL(), this->regA);
+			this->sys->write(this->getHL(), this->regA);
 			return 8;
 		}
 
 		case 0x46: // LD B, (HL)
 		{
-			this->regB = this->mem->read(this->getHL());
+			this->regB = this->sys->read(this->getHL(), true);
 			return 8;
 		}
 
 		case 0x4e: // LD C, (HL)
 		{
-			this->regC = this->mem->read(this->getHL());
+			this->regC = this->sys->read(this->getHL(), true);
 			return 8;
 		}
 
 		case 0x56: // LD D, (HL)
 		{
-			this->regD = this->mem->read(this->getHL());
+			this->regD = this->sys->read(this->getHL(), true);
 			return 8;
 		}
 
 		case 0x5e: // LD E, (HL)
 		{
-			this->regE = this->mem->read(this->getHL());
+			this->regE = this->sys->read(this->getHL(), true);
 			return 8;
 		}
 
 		case 0x66: // LD H, (HL)
 		{
-			this->regH = this->mem->read(this->getHL());
+			this->regH = this->sys->read(this->getHL(), true);
 			return 8;
 		}
 
 		case 0x6e: // LD L, (HL)
 		{
-			this->regL = this->mem->read(this->getHL());
+			this->regL = this->sys->read(this->getHL(), true);
 			return 8;
 		}
 
 		case 0x7e: // LD A, (HL)
 		{
-			this->regA = this->mem->read(this->getHL());
+			this->regA = this->sys->read(this->getHL(), true);
 			return 8;
 		}
 
 		case 0x02: // LD (BC), A
 		{
-			this->mem->write(this->getBC(), this->regA);
+			this->sys->write(this->getBC(), this->regA);
 			return 8;
 		}
 
 		case 0x12: // LD (DE), A
 		{
-			this->mem->write(this->getDE(), this->regA);
+			this->sys->write(this->getDE(), this->regA);
 			return 8;
 		}
 
 		case 0x22: // LD (HL+), A
 		{
-			this->mem->write(this->getHL(), this->regA);
+			this->sys->write(this->getHL(), this->regA);
 			this->setHL(this->getHL() + 1);
 			return 8;
 		}
 
 		case 0x32: // LD (HL-), A
 		{
-			this->mem->write(this->getHL(), this->regA);
+			this->sys->write(this->getHL(), this->regA);
 			this->setHL(this->getHL() - 1);
 			return 8;
 		}
 
 		case 0x06: // LD B, u8
 		{
-			this->regB = this->mem->read(this->regPC++);
+			this->regB = this->sys->read(this->regPC++, true);
 			return 8;
 		}
 
 		case 0x0e: // LD C, u8
 		{
-			this->regC = this->mem->read(this->regPC++);
+			this->regC = this->sys->read(this->regPC++, true);
 			return 8;
 		}
 
 		case 0x16: // LD D, u8
 		{
-			this->regD = this->mem->read(this->regPC++);
+			this->regD = this->sys->read(this->regPC++, true);
 			return 8;
 		}
 
 		case 0x1e: // LD E, u8
 		{
-			this->regE = this->mem->read(this->regPC++);
+			this->regE = this->sys->read(this->regPC++, true);
 			return 8;
 		}
 
 		case 0x26: // LD H, u8
 		{
-			this->regH = this->mem->read(this->regPC++);
+			this->regH = this->sys->read(this->regPC++, true);
 			return 8;
 		}
 
 		case 0x2e: // LD L, u8
 		{
-			this->regL = this->mem->read(this->regPC++);
+			this->regL = this->sys->read(this->regPC++, true);
 			return 8;
 		}
 
 		case 0x3e: // LD A, u8
 		{
-			this->regA = this->mem->read(this->regPC++);
+			this->regA = this->sys->read(this->regPC++, true);
 			return 8;
 		}
 
 		case 0x36: // LD (HL), u8
 		{
-			this->mem->write(this->getHL(), this->mem->read(this->regPC++));
+			this->sys->write(this->getHL(), this->sys->read(this->regPC++, true));
 			return 12;
 		}
 
 		case 0x2a: // LD A, (HL+)
 		{
-			this->regA = this->mem->read(this->getHL());
+			this->regA = this->sys->read(this->getHL(), true);
 			this->setHL(this->getHL() + 1);
 			return 8;
 		}
 
 		case 0x3a: // LD A, (HL-)
 		{
-			this->regA = this->mem->read(this->getHL());
+			this->regA = this->sys->read(this->getHL(), true);
 			this->setHL(this->getHL() - 1);
 			return 8;
 		}
 
 		case 0xea: // LD (u16), A
 		{
-			uint8_t lo = this->mem->read(this->regPC++);
-			uint8_t hi = this->mem->read(this->regPC++);
+			uint8_t lo = this->sys->read(this->regPC++, true);
+			uint8_t hi = this->sys->read(this->regPC++, true);
 
-			this->mem->write((hi << 8) | lo, this->regA);
+			this->sys->write((hi << 8) | lo, this->regA);
 			return 16;
 		}
 
 		case 0xfa: // LD A, (u16)
 		{
-			uint8_t lo = this->mem->read(this->regPC++);
-			uint8_t hi = this->mem->read(this->regPC++);
+			uint8_t lo = this->sys->read(this->regPC++, true);
+			uint8_t hi = this->sys->read(this->regPC++, true);
 
-			this->regA = this->mem->read((hi << 8) | lo);
+			this->regA = this->sys->read((hi << 8) | lo, true);
 			return 16;
 		}
 
 		case 0x76: // HALT
 		{
 			std::cout << "halted\n";
+			return 4;
+		}
+
+		case 0xfb: // EI
+		{
+			this->ime = true;
+			return 4;
+		}
+
+		case 0xf3: // DI
+		{
+			this->ime = false;
 			return 4;
 		}
 
