@@ -24,10 +24,15 @@ void xgb::write(uint16_t addr, uint8_t data)
 uint8_t xgb::read(uint16_t addr)
 {
 	// route to ppu apu etc
-	mem.read(addr);
+	return mem.read(addr);
 }
 
 void xgb::tick()
 {
-	cpu.tick();
+	if (cpu.tick() <= 0)
+	{
+		while (true)
+		{
+		}
+	}
 }

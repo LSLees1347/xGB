@@ -34,10 +34,16 @@ uint8_t cpu::tick()
 {
 	uint8_t opcode = this->sys->read(regPC++);
 
-	printf("0x%02x\n", opcode);
+	printf("\n0x%02x", opcode);
 
 	switch (opcode)
 	{
+		default:
+		{
+			std::cout << " <- INVALID";
+			return 0;
+		}
+		
 		case 0x00: // NOP
 		{
 			return 4;
@@ -91,7 +97,7 @@ uint8_t cpu::tick()
 			return 4;
 		}
 
-		case 0x20: // INC H
+		case 0x24: // INC H
 		{
 			inc8(&this->regH);
 			return 4;
@@ -774,10 +780,176 @@ uint8_t cpu::tick()
 			return 16;
 		}
 
-		default:
+		case 0xc5: // PUSH BC
 		{
-			std::cout << "^^^^MISSING\n\n";
-			return 0;
+			sys->write(--this->regSP, this->regB);
+			sys->write(--this->regSP, this->regC);
+			return 16;
+		}
+
+		case 0xd5: // PUSH DE
+		{
+			sys->write(--this->regSP, this->regD);
+			sys->write(--this->regSP, this->regE);
+			return 16;
+		}
+
+		case 0xe5: // PUSH HL
+		{
+			sys->write(--this->regSP, this->regH);
+			sys->write(--this->regSP, this->regL);
+			return 16;
+		}
+
+		case 0xf5: // PUSH AF
+		{
+			sys->write(--this->regSP, this->regA);
+			sys->write(--this->regSP, this->regF);
+			return 16;
+		}
+
+		case 0xc1: // POP BC
+		{
+			this->regC = sys->read(this->regSP++);
+			this->regB = sys->read(this->regSP++);
+			return 12;
+		}
+
+		case 0xd1: // POP DE
+		{
+			this->regE = sys->read(this->regSP++);
+			this->regD = sys->read(this->regSP++);
+			return 12;
+		}
+
+		case 0xe1: // POP HL
+		{
+			this->regL = sys->read(this->regSP++);
+			this->regH = sys->read(this->regSP++);
+			return 12;
+		}
+
+		case 0xf1: // POP AF
+		{
+			this->regF = sys->read(this->regSP++) & 0xf0;
+			this->regA = sys->read(this->regSP++);
+			return 12;
+		}
+
+		case 0xc3: // JP u16
+		{
+			uint8_t lo = sys->read(this->regPC++);
+			uint8_t hi = sys->read(this->regPC++);
+			this->regPC = (hi << 8) | lo;
+			return 16;
+		}
+
+		case 0xc2: // JP NZ, u16
+		{
+			uint8_t lo = sys->read(this->regPC++);
+			uint8_t hi = sys->read(this->regPC++);
+			uint16_t addr = (hi << 8) | lo;
+
+			if (!(this->regF & flagZ))
+			{
+				this->regPC = addr;
+				return 16;
+			}
+			return 12;
+		}
+
+		case 0xca: // JP Z
+		{
+			uint8_t lo = sys->read(this->regPC++);
+			uint8_t hi = sys->read(this->regPC++);
+			uint16_t addr = (hi << 8) | lo;
+
+			if (this->regF & flagZ)
+			{
+				this->regPC = addr;
+				return 16;
+			}
+			return 12;
+		}
+
+		case 0xd2: // JP NC, u16
+		{
+			uint8_t lo = sys->read(this->regPC++);
+			uint8_t hi = sys->read(this->regPC++);
+			uint16_t addr = (hi << 8) | lo;
+
+			if (!(this->regF & flagC))
+			{
+				this->regPC = addr;
+				return 16;
+			}
+			return 12;
+		}
+
+		case 0xda: // JP C
+		{
+			uint8_t lo = sys->read(this->regPC++);
+			uint8_t hi = sys->read(this->regPC++);
+			uint16_t addr = (hi << 8) | lo;
+
+			if (this->regF & flagC)
+			{
+				this->regPC = addr;
+				return 16;
+			}
+			return 12;
+		}
+
+		case 0x18: // JR i8
+		{
+			this->regPC += (uint8_t)sys->read(this->regPC++);
+			return 12;
+		}
+
+		case 0x20: // JR NZ, i8
+		{
+			if (!(this->regF & flagZ))
+			{
+				this->regPC += (uint8_t)sys->read(this->regPC++);
+				return 12;
+			}
+			return 8;
+		}
+
+		case 0x30: // JR NC, i8
+		{
+			if (!(this->regF & flagC))
+			{
+				this->regPC += (uint8_t)sys->read(this->regPC++);
+				return 12;
+			}
+			return 8;
+		}
+
+		case 0x28: // JR Z, i8
+		{
+			if (this->regF & flagZ)
+			{
+				this->regPC += (uint8_t)sys->read(this->regPC++);
+				return 12;
+			}
+			return 8;
+		}
+
+		case 0x38: // JR C, i8
+		{
+			if (this->regF & flagC)
+			{
+				this->regPC += (uint8_t)sys->read(this->regPC++);
+				return 12;
+			}
+			return 8;
+		}
+
+		case 0xe9: // JP HL
+		{
+			this->regPC = this->getHL();
+			return 4;
 		}
 	}
 }

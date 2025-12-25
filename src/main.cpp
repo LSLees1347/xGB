@@ -21,16 +21,9 @@ int main(int argc, char* argv[])
 
     std::cout << "rom loaded\n";
 
-    int i = 0;
-    while (i < 30)
-    {
-        sys->tick();
-        i++;
-    }
-
     while (true)
     {
-
+        sys->tick();
     }
 
     return 0;
