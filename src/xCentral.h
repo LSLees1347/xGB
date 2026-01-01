@@ -81,4 +81,10 @@ private:
 	void inc8(uint8_t* reg);
 	void dec8(uint8_t* reg);
 	void add(uint8_t reg);
+	void sub(uint8_t reg);
+	void sbc(uint8_t reg);
+	void rAnd(uint8_t reg);
+	void rXor(uint8_t reg);
+	void rOr(uint8_t reg);
+	void rCp(uint8_t reg);
 };

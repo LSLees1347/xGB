@@ -64,11 +64,65 @@ void cpu::add(uint8_t reg)
 	this->regA = (uint8_t)sum;
 }
 
+void cpu::sub(uint8_t reg)
+{
+	uint16_t sum = this->regA + reg;
+	this->regF = flagN;
+	if ((sum & 0xff) == 0) this->regF |= flagZ;
+	if ((this->regA & 0x0f) < (sum & 0x0f)) this->regF |= flagH;
+	if (this->regA < reg) this->regF |= flagC;
+	this->regA = (uint8_t)sum;
+}
+
+void cpu::sbc(uint8_t reg)
+{
+	uint8_t carry = (this->regF & flagC) ? 1 : 0;
+	int sum = (int)this->regA - reg - carry;
+	this->regF = flagN;
+	if ((reg & 0xff) == 0) this->regF |= flagZ;
+	if (((this->regA & 0x0f) - (reg & 0x0f) - carry) < 0) this->regF |= flagH;
+	if (sum < 0) this->regF |= flagC;
+	this->regA = (uint8_t)sum;
+}
+
+void cpu::rAnd(uint8_t reg)
+{
+	this->regA &= reg;
+	this->regF = flagH;
+	if (this->regA == 0) this->regF |= flagZ;
+}
+
+void cpu::rXor(uint8_t reg)
+{
+	this->regA ^= reg;
+	this->regF = 0;
+	if (this->regA == 0) this->regF |= flagZ;
+}
+
+void cpu::rOr(uint8_t reg)
+{
+	this->regA |= reg;
+	this->regF = 0;
+	if (this->regA == 0) this->regF |= flagZ;
+}
+
+void cpu::rCp(uint8_t reg)
+{
+	this->regF = flagN;
+	if (this->regA == reg) this->regF |= flagZ;
+	if ((this->regA & 0x0f) < (reg & 0x0f)) this->regF |= flagH;
+	if (this->regA < reg) this->regF |= flagC;
+}
+
 uint8_t cpu::tick()
 {
 	uint8_t opcode = this->sys->read(regPC++);
 
 	printf("\n0x%02x", opcode);
+
+	if (opcode == 0xcb)
+	{
+	}
 
 	switch (opcode)
 	{
@@ -1117,6 +1171,386 @@ uint8_t cpu::tick()
 		{
 			add(this->regA);
 			return 4;
+		}
+
+		case 0x90: // SUB A, B
+		{
+			sub(this->regB);
+			return 4;
+		}
+
+		case 0x91: // SUB A, C
+		{
+			sub(this->regC);
+			return 4;
+		}
+
+		case 0x92: // SUB A, D
+		{
+			sub(this->regD);
+			return 4;
+		}
+
+		case 0x93: // SUB A, E
+		{
+			sub(this->regE);
+			return 4;
+		}
+
+		case 0x94: // SUB A, H
+		{
+			sub(this->regH);
+			return 4;
+		}
+
+		case 0x95: // SUB A, L
+		{
+			sub(this->regL);
+			return 4;
+		}
+
+		case 0x96: // SUB A, (HL)
+		{
+			sub(this->sys->read(this->getHL()));
+			return 8;
+		}
+
+		case 0x97: // SUB A, A
+		{
+			sub(this->regA);
+			return 4;
+		}
+
+		case 0x98: // SBC A, B
+		{
+			sbc(this->regB);
+			return 4;
+		}
+
+		case 0x99: // SBC A, C
+		{
+			sbc(this->regC);
+			return 4;
+		}
+
+		case 0x9a: // SBC A, D
+		{
+			sbc(this->regD);
+			return 4;
+		}
+
+		case 0x9b: // SBC A, E
+		{
+			sbc(this->regE);
+			return 4;
+		}
+
+		case 0x9c: // SBC A, H
+		{
+			sbc(this->regH);
+			return 4;
+		}
+
+		case 0x9d: // SBC A, L
+		{
+			sbc(this->regL);
+			return 4;
+		}
+
+		case 0x9e: // SBC A, (HL)
+		{
+			sbc(this->sys->read(this->getHL()));
+			return 8;
+		}
+
+		case 0x9f: // SBC A, A
+		{
+			sbc(this->regA);
+			return 4;
+		}
+
+		case 0xa0: // AND A, B
+		{
+			rAnd(this->regB);
+			return 4;
+		}
+
+		case 0xa1: // AND A, C
+		{
+			rAnd(this->regC);
+			return 4;
+		}
+
+		case 0xa2: // AND A, D
+		{
+			rAnd(this->regD);
+			return 4;
+		}
+
+		case 0xa3: // AND A, E
+		{
+			rAnd(this->regE);
+			return 4;
+		}
+
+		case 0xa4: // AND A, H
+		{
+			rAnd(this->regH);
+			return 4;
+		}
+
+		case 0xa5: // AND A, L
+		{
+			rAnd(this->regL);
+			return 4;
+		}
+
+		case 0xa6: // AND A, (HL)
+		{
+			rAnd(this->sys->read(this->getHL()));
+			return 8;
+		}
+
+		case 0xa7: // AND A, A
+		{
+			rAnd(this->regA);
+			return 4;
+		}
+
+		case 0xa8: // XOR A, B
+		{
+			rXor(this->regB);
+			return 4;
+		}
+
+		case 0xa9: // XOR A, C
+		{
+			rXor(this->regC);
+			return 4;
+		}
+		case 0xaa: // XOR A, D
+		{
+			rXor(this->regD);
+			return 4;
+		}
+
+		case 0xab: // XOR A, E
+		{
+			rXor(this->regE);
+			return 4;
+		}
+
+		case 0xac: // XOR A, H
+		{
+			rXor(this->regH);
+			return 4;
+		}
+
+		case 0xad: // XOR A, L
+		{
+			rXor(this->regL);
+			return 4;
+		}
+
+		case 0xae: // XOR A, (HL)
+		{
+			rXor(this->sys->read(this->getHL()));
+			return 8;
+		}
+
+		case 0xaf: // XOR A, A
+		{
+			rXor(this->regA);
+			return 4;
+		}
+
+		case 0xb0: // OR A, B
+		{
+			rOr(this->regB);
+			return 4;
+		}
+
+		case 0xb1: // OR A, C
+		{
+			rOr(this->regC);
+			return 4;
+		}
+
+		case 0xb2: // OR A, D
+		{
+			rOr(this->regD);
+			return 4;
+		}
+
+		case 0xb3: // OR A, E
+		{
+			rOr(this->regE);
+			return 4;
+		}
+
+		case 0xb4: // OR A, H
+		{
+			rOr(this->regH);
+			return 4;
+		}
+
+		case 0xb5: // OR A, L
+		{
+			rOr(this->regL);
+			return 4;
+		}
+
+		case 0xb6: // OR A, (HL)
+		{
+			rOr(this->sys->read(this->getHL()));
+			return 8;
+		}
+
+		case 0xb7: // OR A, A
+		{
+			rOr(this->regA);
+			return 4;
+		}
+
+		case 0xb8: // CP A, B
+		{
+			rCp(this->regB);
+			return 4;
+		}
+
+		case 0xb9: // CP A, C
+		{
+			rCp(this->regC);
+			return 4;
+		}
+
+		case 0xba: // CP A, D
+		{
+			rCp(this->regD);
+			return 4;
+		}
+
+		case 0xbb: // CP A, E
+		{
+			rCp(this->regE);
+			return 4;
+		}
+
+		case 0xbc: // CP A, H
+		{
+			rCp(this->regH);
+			return 4;
+		}
+
+		case 0xbd: // CP A, L
+		{
+			rCp(this->regL);
+			return 4;
+		}
+
+		case 0xbe: // CP A, (HL)
+		{
+			rCp(this->sys->read(this->getHL()));
+			return 4;
+		}
+
+		case 0xbf: // CP A, A
+		{
+			rCp(this->regA);
+			return 4;
+		}
+
+		case 0xfe: // CP A, u8
+		{
+			rCp(this->sys->read(this->regPC++));
+			return 8;
+		}
+
+		case 0x27: // DAA
+		{
+			uint16_t correction = 0;
+			bool nFlag = this->regF & flagN;
+			bool hFlag = this->regF & flagH;
+			bool cFlag = this->regF & flagC;
+
+			if (!nFlag)
+			{
+				if (hFlag || (this->regA & 0x0F) > 9)
+				{
+					correction |= 0x06;
+				}
+
+				if (cFlag || this->regA > 0x99)
+				{
+					correction |= 0x60;
+					cFlag = true;
+				}
+
+				this->regA += correction;
+			}
+			else
+			{
+				if (hFlag) correction |= 0x06;
+				if (cFlag) correction |= 0x60;
+
+				this->regA -= correction;
+			}
+
+			this->regF = 0;
+			if (this->regA == 0) this->regF |= flagZ;
+
+			if (cFlag) this->regF |= flagC;
+			if (nFlag) this->regF |= flagN;
+
+			return 4; // thanks gpt!
+		}
+
+		case 0x2f: // CPL
+		{
+			this->regA = ~this->regA;
+			this->regF |= flagN;
+			this->regF |= flagH;
+			return 4;
+		}
+
+		case 0x37: // SCF
+		{
+			this->regF &= ~flagN;
+			this->regF &= ~flagH;
+			this->regF |= flagC;
+			return 4;
+		}
+
+		case 0x3f: // CCF
+		{
+			this->regF ^= flagC;
+			this->regF &= ~flagN;
+			this->regF &= ~flagH;
+			return 4;
+		}
+
+		case 0xe0: // LD (FF00+u8), A
+		{
+			this->sys->write(0xff00 + this->sys->read(this->regPC++), this->regA);
+			return 12;
+		}
+
+		case 0xe2: // LD (FF00+C), A
+		{
+			this->sys->write(0xff00 + this->regC, this->regA);
+			return 8;
+		}
+
+		case 0xf0: // LD A, (FF00+u8)
+		{
+			this->regA = this->sys->read(0xff00 + this->sys->read(this->regPC++));
+			return 12;
+		}
+
+		case 0xf2: // LD A, (FF00+C)
+		{
+			this->regA = this->sys->read(0xff00 + this->regC);
+			return 8;
 		}
 	}
 }
